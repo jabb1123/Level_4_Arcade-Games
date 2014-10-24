@@ -9,7 +9,7 @@
 
 from graphics import *
 
-LEVEL_WIDTH = 20
+LEVEL_WIDTH = 35
 LEVEL_HEIGHT = 20    
 
 CELL_SIZE = 24
@@ -86,46 +86,82 @@ def won (window):
 # 0 empty
 # 1 brick
 
-
+"""
+(a) Implement a function create_level() that creates the initial level of the game.
+That will require you to think about what you want to use as a data structure to represent your level. 
+Remember, your structure should record what tile goes at every position in the level. 
+Each position in the level should contain one of: nothing, bricks, ladder, rope, pile of gold.
+ The initial level is a grid 35 by 20 positions looking like this: 
+ """
+ 
 def create_level (num):
-    screen = []
-    screen.extend([1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1])
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1])
-    screen.extend([1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1])
-    screen.extend([1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1])
-    screen.extend([1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1])
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1])
-    screen.extend([1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1])
-    screen.extend([1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1])
-    screen.extend([1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1])
-    screen.extend([1,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1])
-    screen.extend([1,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,1])
-    screen.extend([1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1])
-    screen.extend([1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1])
-    screen.extend([1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1])
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1])
-    screen.extend([1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1])
-    screen.extend([1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1])
-    screen.extend([1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1])
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1])
-    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    #nothing = 0,bricks = 1,ladder = 2,rope = 3,gold = 4.
+    screen = [] 
+    
+    
+    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,0]) #13,1,7,1,12,1
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]) #1,34
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0]) #1,15,1,1,1,10,1,5
+    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1])
+    
+    screen.extend([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,2,1,0,0,0,1,2,0,1]) 
+    screen.extend([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,1,1,1,1])
+    screen.extend([3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,0,0,0,0,0,0,0,0,2,0,0,0,0,3,3,3,3])   
+    screen.extend([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0]) 
+    screen.extend([2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1]) 
+    
+    
+    screen.extend([2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,2,3,3,3,3,3,3,3,2]) 
+    screen.extend([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2]) 
+    screen.extend([2,0,0,0,0,0,3,3,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2])
+    
+    screen.extend([2,0,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,2,1,0,0,0,0,3,3,3,2,0,0,1,1,1,1,1,2])
+    screen.extend([2,0,1,0,0,1,0,0,1,0,0,0,0,1,0,0,1,2,1,1,1,1,1,1,0,0,2,0,0,1,0,0,0,1,2])
+    screen.extend([2,0,1,4,4,1,0,0,1,0,4,4,4,1,0,0,1,2,0,4,4,4,0,1,0,0,2,0,0,1,4,4,4,1,2])
+    screen.extend([2,0,1,1,1,1,0,0,1,2,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,0,2,0,0,1,1,1,1,1,2]) 
+    
+    screen.extend([2,0,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,2]) 
+    screen.extend([1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1]) 
+    screen.extend([1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,2,0,0,0,0,0,0,0,1])
+    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]) 
+    
     return screen
+
+"""
+(b) Implement a function create_screen() that takes a level and a window (created by graphics.GraphWin)
+ and draws a representation of the level in the window, as in the above. 
+"""
 
 def create_screen (level,window):
     # use this instead of Rectangle below for nicer screen
     brick = 'brick.gif'
+    ladder = 'ladder.gif'
+    rope = 'rope.gif'
+    gold = 'gold.gif'
+    
     def image (sx,sy,what):
         return Image(Point(sx+CELL_SIZE/2,sy+CELL_SIZE/2),what)
 
     for (index,cell) in enumerate(level):
         if cell != 0:
             (sx,sy) = screen_pos_index(index)
-            elt = Rectangle(Point(sx+1,sy+1),
-                            Point(sx+CELL_SIZE-1,sy+CELL_SIZE-1))
-            elt.setFill('sienna')
+            if cell == 1:
+                elt = image(sx,sy,brick)
+            elif cell==2:
+                elt = image(sx,sy,ladder)
+            elif cell==3:
+                elt = image(sx,sy,rope)
+            elif cell==4:
+                elt = image(sx,sy,gold)
+
             elt.draw(window)
 
-
+"""
+Image(anchorPoint, filename)
+Constructs an image from contents of the given file, centered at the given anchor point. 
+Can also be called with width and height parameters instead of filename.
+ In this case, a blank (transparent) image is created of the given width and height.
+"""
 MOVE = {
     'Left': (-1,0),
     'Right': (1,0),
