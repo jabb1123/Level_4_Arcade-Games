@@ -28,6 +28,7 @@ def screen_pos_index (index):
 def index (x,y):
     return x + (y*LEVEL_WIDTH)
 
+
 class Character (object):
     def __init__ (self,pic,x,y,window,level):
         (sx,sy) = screen_pos(x,y)
@@ -41,15 +42,47 @@ class Character (object):
     def same_loc (self,x,y):
         return (self._x == x and self._y == y)
 
+#nothing = 0,bricks = 1,ladder = 2,rope = 3,gold = 4.
+    
     def move (self,dx,dy):
         tx = self._x + dx
         ty = self._y + dy
+        below = ty+1
+        gravity = 0
+
+    
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            if self._level[index(tx,ty)] == 0:
+            
+            if self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
+                self._x = tx
+                self._y = ty
+                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                print 'here'
+            
+            #if self._level[index(self._x,self._y)]
+            
+            elif self._level[index(tx,ty)] == 0 and dy==0:
+                if self._level[index(tx,ty+1)] == 0:
+                    while self._level[index(tx,ty+gravity)]==0:
+                        gravity += 1
+                    self._x = tx
+                    self._y = ty+gravity-1
+                    self._img.move(dx*CELL_SIZE,(gravity-1)*CELL_SIZE)
+                
+                else:
+                    self._x = tx
+                    self._y = ty
+                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+            
+            elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] != 0 and dy == -1:
+                print 'yes'
                 self._x = tx
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
                 
+    
+                              
+
 
 class Player (Character):
     def __init__ (self,x,y,window,level):
@@ -120,7 +153,7 @@ def create_level (num):
     screen.extend([2,0,1,4,4,1,0,0,1,0,4,4,4,1,0,0,1,2,0,4,4,4,0,1,0,0,2,0,0,1,4,4,4,1,2])
     screen.extend([2,0,1,1,1,1,0,0,1,2,1,1,1,1,0,0,1,1,1,1,1,1,1,1,0,0,2,0,0,1,1,1,1,1,2]) 
     
-    screen.extend([2,0,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,2]) 
+    screen.extend([2,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,2]) 
     screen.extend([1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1]) 
     screen.extend([1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,2,0,0,0,0,0,0,0,1])
     screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]) 
