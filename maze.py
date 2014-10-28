@@ -30,7 +30,7 @@ def index (x,y):
 
 
 class Character (object):
-    def __init__ (self,pic,x,y,window,level):
+    def __init__ (self,pic,x,y,window,level,screen):
         (sx,sy) = screen_pos(x,y)
         self._img = Image(Point(sx+CELL_SIZE/2,sy+CELL_SIZE/2+2),pic)
         self._window = window
@@ -38,6 +38,7 @@ class Character (object):
         self._x = x
         self._y = y
         self._level = level
+        self._screen = screen
 
     def same_loc (self,x,y):
         return (self._x == x and self._y == y)
@@ -103,23 +104,39 @@ class Character (object):
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
                 
-    
-                              
+    def dig (self,x,y):
+        tx = self._x + x
+        ty = self._y + y
+        if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
+            if self._level[index(tx,ty)] == 1:
+                self._level[index(tx,ty)] = 0
+                hole = Hole(tx,ty,self._window,self._screen)
 
 
 class Player (Character):
-    def __init__ (self,x,y,window,level):
-        Character.__init__(self,'android.gif',x,y,window,level)
+    def __init__ (self,x,y,window,level,screen):
+        Character.__init__(self,'android.gif',x,y,window,level,screen)
 
     def at_exit (self):
         return (self._y == 0)
 
 
 class Baddie (Character):
-    def __init__ (self,x,y,window,level,player):
-        Character.__init__(self,'red.gif',x,y,window,level)
+    def __init__ (self,x,y,window,level,player,screen):
+        Character.__init__(self,'red.gif',x,y,window,level,screen)
         self._player = player
 
+
+class Hole (object):
+    def __init__(self,x,y,window,screen):
+        self._x = x
+        self._y = y
+        self._window = window
+        (sx,sy) = screen_pos(x,y)
+        self._img = screen[(sx,sy)].undraw()
+        
+
+        
 
 def lost (window):
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
@@ -194,7 +211,7 @@ def create_screen (level,window):
     ladder = 'ladder.gif'
     rope = 'rope.gif'
     gold = 'gold.gif'
-    
+    elt = {}
     def image (sx,sy,what):
         return Image(Point(sx+CELL_SIZE/2,sy+CELL_SIZE/2),what)
 
@@ -202,15 +219,16 @@ def create_screen (level,window):
         if cell != 0:
             (sx,sy) = screen_pos_index(index)
             if cell == 1:
-                elt = image(sx,sy,brick)
+                elt[(sx,sy)] = image(sx,sy,brick)
             elif cell==2:
-                elt = image(sx,sy,ladder)
+                elt[(sx,sy)] = image(sx,sy,ladder)
             elif cell==3:
-                elt = image(sx,sy,rope)
+                elt[(sx,sy)] = image(sx,sy,rope)
             elif cell==4:
-                elt = image(sx,sy,gold)
+                elt[(sx,sy)] = image(sx,sy,gold)
 
-            elt.draw(window)
+            elt[(sx,sy)].draw(window)
+    return elt
 
 """
 Image(anchorPoint, filename)
@@ -224,6 +242,11 @@ MOVE = {
     'Up' : (0,-1),
     'Down' : (0,1)
 }
+
+DIG = {
+    'a':(-1,1),
+    's':(1,1)
+    }
 
 
 def main ():
@@ -243,11 +266,11 @@ def main ():
 
     screen = create_screen(level,window)
 
-    p = Player(10,18,window,level)
+    p = Player(10,18,window,level,screen)
 
-    baddie1 = Baddie(5,1,window,level,p)
-    baddie2 = Baddie(10,1,window,level,p)
-    baddie3 = Baddie(15,1,window,level,p)
+    baddie1 = Baddie(5,1,window,level,p,screen)
+    baddie2 = Baddie(10,1,window,level,p,screen)
+    baddie3 = Baddie(15,1,window,level,p,screen)
 
     while not p.at_exit():
         key = window.checkKey()
@@ -257,6 +280,10 @@ def main ():
         if key in MOVE:
             (dx,dy) = MOVE[key]
             p.move(dx,dy)
+        if key in DIG:
+            (x,y) = DIG[key]
+            print x,y
+            p.dig(x,y)
 
         # baddies should probably move here
 
