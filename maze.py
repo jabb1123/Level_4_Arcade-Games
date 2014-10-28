@@ -50,6 +50,16 @@ class Character (object):
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
                 
+    def dig (self,x,y):
+        tx = self._x + x
+        ty = self._y + y
+        print tx,ty
+        if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
+            print self._level[index(tx,ty)]
+            if self._level[index(tx,ty)] == 1:
+                self._level[index(tx,ty)] = 0
+                (sx,sy) = screen_pos_index(index(tx,ty))
+                hole = Hole(tx,ty,self._window)
 
 class Player (Character):
     def __init__ (self,x,y,window,level):
@@ -64,6 +74,16 @@ class Baddie (Character):
         Character.__init__(self,'red.gif',x,y,window,level)
         self._player = player
 
+
+class Hole (object):
+    def __init__(self,x,y,window):
+        self._x = x
+        self._y = y
+        self._window = window
+        
+        
+
+        
 
 def lost (window):
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
@@ -169,6 +189,11 @@ MOVE = {
     'Down' : (0,1)
 }
 
+DIG = {
+    'a':(-1,1),
+    's':(1,1)
+    }
+
 
 def main ():
 
@@ -201,6 +226,10 @@ def main ():
         if key in MOVE:
             (dx,dy) = MOVE[key]
             p.move(dx,dy)
+        if key in DIG:
+            (x,y) = DIG[key]
+            print x,y
+            p.dig(x,y)
 
         # baddies should probably move here
 
