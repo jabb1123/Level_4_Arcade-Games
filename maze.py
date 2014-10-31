@@ -10,7 +10,9 @@
 from graphics import *
 
 LEVEL_WIDTH = 35
-LEVEL_HEIGHT = 20    
+LEVEL_HEIGHT = 20
+
+Timer = 50000
 
 CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
@@ -81,13 +83,13 @@ class Character (object):
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
                 
-    def dig (self,x,y):
+    def dig (self,x,y,timer):
         tx = self._x + x
         ty = self._y + y
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
             if self._level[index(tx,ty)] == 1:
-                self._level[index(tx,ty)] = 0
-                hole = Hole(tx,ty,self._window,self._screen)
+                hole = Hole(tx,ty,self._window,self._screen,timer,self._level)
+                return hole
 
 
 class Player (Character):
@@ -105,14 +107,20 @@ class Baddie (Character):
 
 
 class Hole (object):
-    def __init__(self,x,y,window,screen):
+    def __init__(self,x,y,window,screen,timer,level):
         self._x = x
         self._y = y
+        self._level = level
+        self.screen = screen
         self._window = window
-        (sx,sy) = screen_pos(x,y)
-        self._img = screen[(sx,sy)].undraw()
-        
-
+        self.timer = timer
+        (self.sx,self.sy) = screen_pos(self._x,self._y)
+        self._level[index(x,y)] = 0
+        self._img = self.screen[(self.sx,self.sy)].undraw()
+    
+    def fillHole(self):
+        self._level[index(self._x,self._y)] = 1
+        self._img = self.screen[(self.sx,self.sy)].draw(self._window)
         
 
 def lost (window):
@@ -248,7 +256,8 @@ def main ():
     baddie1 = Baddie(5,1,window,level,p,screen)
     baddie2 = Baddie(10,1,window,level,p,screen)
     baddie3 = Baddie(15,1,window,level,p,screen)
-
+    holes = []
+    current_time = []
     while not p.at_exit():
         key = window.checkKey()
         if key == 'q':
@@ -259,8 +268,17 @@ def main ():
             p.move(dx,dy)
         if key in DIG:
             (x,y) = DIG[key]
-            print x,y
-            p.dig(x,y)
+            holes.append(p.dig(x,y,Timer))
+            current_time.append(0)
+        if holes != []:
+            if holes[0] == None:
+                del holes[0]
+            elif holes[0].timer-current_time[0]<=0:
+                hole = holes.pop(0)
+                hole.fillHole()
+                current_time.pop(0)
+        for i in range(len(current_time)):
+            current_time[i]+=1
 
         # baddies should probably move here
 
