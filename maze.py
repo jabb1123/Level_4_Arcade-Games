@@ -82,19 +82,20 @@ class Character (object):
                     self._y = ty
                     self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
             
-            elif self._level[index(self._x,self._y)] == 2 and self._level[index(tx,ty)] == 0 and dy == 1:
-                print 'w'
+            elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
+                print 'w', gravity
                 while self._level[index(tx,ty+gravity)]==0:
                     gravity += 1
+                    
                 if self._level[index(tx,ty+gravity)]!=1:
                         self._x = tx
                         self._y = ty+gravity
-                        self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+                        self._img.move(dx*CELL_SIZE,(gravity+1)*CELL_SIZE)
                 
                 else:
                     self._x = tx
                     self._y = ty+gravity-1
-                    self._img.move(dx*CELL_SIZE,(gravity-1)*CELL_SIZE)
+                    self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
                 
             
             
