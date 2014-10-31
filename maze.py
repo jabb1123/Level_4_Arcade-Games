@@ -21,6 +21,18 @@ WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
 WINDOW_HEIGHT = CELL_SIZE*LEVEL_HEIGHT
 
 
+MOVE = {
+    'Left': (-1,0),
+    'Right': (1,0),
+    'Up' : (0,-1),
+    'Down' : (0,1)
+}
+
+DIG = {
+    'z':(-1,1),
+    'x':(1,1)
+    }
+
 def screen_pos (x,y):
     return (x*CELL_SIZE+10,y*CELL_SIZE+10)
 
@@ -130,6 +142,12 @@ class Baddie (Character):
         Character.__init__(self,'red.gif',x,y,window,level,screen)
         self._player = player
 
+    def baddieMove(self):
+        (x,y)=MOVE[random.choice(MOVE.keys())]
+        self.move(x,y)
+        t =Timer(.1,self.baddieMove)
+        t.start()
+        
 
 class Hole (object):
     def __init__(self,x,y,window,screen,level):
@@ -245,17 +263,7 @@ Constructs an image from contents of the given file, centered at the given ancho
 Can also be called with width and height parameters instead of filename.
  In this case, a blank (transparent) image is created of the given width and height.
 """
-MOVE = {
-    'Left': (-1,0),
-    'Right': (1,0),
-    'Up' : (0,-1),
-    'Down' : (0,1)
-}
 
-DIG = {
-    'z':(-1,1),
-    'x':(1,1)
-    }
 
 
 def main ():
@@ -281,10 +289,10 @@ def main ():
     baddie2 = Baddie(10,1,window,level,p,screen)
     baddie3 = Baddie(15,1,window,level,p,screen)
     holes = []
-    b1 = Timer(1,baddie1.move,[random.choice(MOVE.keys())])
-    b2 = Timer(1,baddie2.move,[random.choice(MOVE.keys())])
-    b3 = Timer(1,baddie3.move,[random.choice(MOVE.keys())])
+    b1 = Timer(3,baddie1.baddieMove)
     b1.start()
+    b2 = Timer(1,baddie2.baddieMove)
+    b3 = Timer(1,baddie3.baddieMove)
     b2.start()
     b3.start()
     while not p.at_exit():
@@ -306,10 +314,10 @@ def main ():
                 hole = holes.pop(0)
                 t =Timer(5,hole.fillHole)
                 t.start()
-        #b1.cancel()
         #b2.cancel()
         #b3.cancel()
         
+
         # baddies should probably move here
 
     won(window)
