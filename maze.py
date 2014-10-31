@@ -52,25 +52,28 @@ class Character (object):
     def move (self,dx,dy):
         tx = self._x + dx
         ty = self._y + dy
-        below = ty+1
+        unStandable = [0,3,4]
         gravity = 0
 
     
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
             
-            if self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
-                
-                
-                
+            if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
+                pass
+            elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
                 self._x = tx
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
-                print 'here'
+            
+            elif self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
+                self._x = tx
+                self._y = ty
+                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
             
             
             elif self._level[index(tx,ty)] == 0 and dy==0:
                 if self._level[index(tx,ty+1)] == 0:
-                    while self._level[index(tx,ty+gravity)]==0:
+                    while ty+gravity+1 < LEVEL_HEIGHT and self._level[index(tx,ty+gravity)]==0:
                         gravity += 1
                     if self._level[index(tx,ty+gravity)]!=1:
                         self._x = tx
@@ -87,8 +90,7 @@ class Character (object):
                     self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
             
             elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
-                print 'w', gravity
-                while self._level[index(tx,ty+gravity)]==0:
+                while self._level[index(tx,ty+gravity)]==0 and ty+gravity+1 < LEVEL_HEIGHT:
                     gravity += 1
                     
                 if self._level[index(tx,ty+gravity)]!=1:
@@ -103,11 +105,8 @@ class Character (object):
                 
             
             
-            elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] != 0 and dy == -1:
-                print 'yes'
-                self._x = tx
-                self._y = ty
-                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+
+                
                 
     def dig (self,x,y):
         tx = self._x + x
