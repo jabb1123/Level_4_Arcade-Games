@@ -58,6 +58,7 @@ class Character (object):
             
             if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
                 pass
+            
             elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
                 self._x = tx
                 self._y = ty
@@ -100,11 +101,9 @@ class Character (object):
                     self._x = tx
                     self._y = ty+gravity-1
                     self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
-                
+        
+        
             
-            
-
-                
                 
     def dig (self,x,y,timer):
         tx = self._x + x
@@ -113,14 +112,29 @@ class Character (object):
             if self._level[index(tx,ty)] == 1:
                 hole = Hole(tx,ty,self._window,self._screen,timer,self._level)
                 return hole
+    
+            
 
 
 class Player (Character):
     def __init__ (self,x,y,window,level,screen):
         Character.__init__(self,'android.gif',x,y,window,level,screen)
+        self.gold = 0
 
     def at_exit (self):
         return (self._y == 0)
+    
+    def onGold (self, level):
+        if self._level[index(self._x, self._y)] == 4:
+            self.gold += 1
+            self.dig(0,0,0)
+            
+            if self.gold >= 1:
+                level[34] == 2
+                level[69] == 2
+                level[94] == 2
+        
+        
 
 
 class Baddie (Character):
@@ -154,7 +168,10 @@ def lost (window):
     window.getKey()
     exit(0)
 
+
+
 def won (window):
+    
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU WON!')
     t.setSize(36)
     t.setTextColor('red')
@@ -272,6 +289,7 @@ def main ():
 
     level = create_level(1)
 
+
     screen = create_screen(level,window)
 
     p = Player(10,18,window,level,screen)
@@ -281,14 +299,19 @@ def main ():
     baddie3 = Baddie(15,1,window,level,p,screen)
     holes = []
     current_time = []
+    
     while not p.at_exit():
         key = window.checkKey()
+        p.onGold(level)
+        
         if key == 'q':
             window.close()
             exit(0)
         if key in MOVE:
             (dx,dy) = MOVE[key]
             p.move(dx,dy)
+        
+        
         if key in DIG:
             (x,y) = DIG[key]
             holes.append(p.dig(x,y,Timer))
