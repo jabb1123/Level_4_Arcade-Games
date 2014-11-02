@@ -9,12 +9,15 @@
 
 from graphics import *
 from threading import Timer
+from time import sleep
 import random
 
 LEVEL_WIDTH = 35
 LEVEL_HEIGHT = 20
 
 movementSpeed = .2
+steps = 24
+pause = 0.01
 
 CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
@@ -65,11 +68,13 @@ class Character (object):
 
 #nothing = 0,bricks = 1,ladder = 2,rope = 3,gold = 4.
     
+
     def move (self,dx,dy):
         tx = self._x + dx
         ty = self._y + dy
         unStandable = [0,3,4]
         gravity = 0
+        i=0
 
         if self._level[index(self._x,self._y)] != 1:
             if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
@@ -79,12 +84,19 @@ class Character (object):
                 elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
                     self._x = tx
                     self._y = ty
-                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                    while i < steps:
+                        self._img.move(dx*CELL_SIZE/steps,dy*CELL_SIZE/steps)
+                        i += 1
+                        sleep(pause)
+
                 
                 elif self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
                     self._x = tx
                     self._y = ty
-                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                    while i < steps:
+                        self._img.move(dx*CELL_SIZE/steps,dy*CELL_SIZE/steps)
+                        i += 1
+                        sleep(pause)
                 
                 
                 elif self._level[index(tx,ty)] == 0 and dy==0:
@@ -94,16 +106,25 @@ class Character (object):
                         if self._level[index(tx,ty+gravity)]!=1:
                             self._x = tx
                             self._y = ty+gravity
-                            self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+                            while i < steps:
+                                self._img.move(dx*CELL_SIZE/steps,(gravity)*CELL_SIZE/steps)
+                                i += 1
+                                sleep(pause)
                         else:
                             self._x = tx
                             self._y = ty+gravity-1
-                            self._img.move(dx*CELL_SIZE,(gravity-1)*CELL_SIZE)
+                            while i < steps:
+                                self._img.move(dx*CELL_SIZE/steps,(gravity-1)*CELL_SIZE/steps)
+                                i += 1
+                                sleep(pause)
                     
                     else:
                         self._x = tx
                         self._y = ty
-                        self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                        while i < steps:
+                            self._img.move(dx*CELL_SIZE/steps,dy*CELL_SIZE/steps)
+                            i += 1
+                            sleep(pause)
                 
                 elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
                     while self._level[index(tx,ty+gravity)]==0 and ty+gravity+1 < LEVEL_HEIGHT:
@@ -112,13 +133,21 @@ class Character (object):
                     if self._level[index(tx,ty+gravity)]!=1:
                         self._x = tx
                         self._y = ty+gravity
-                        self._img.move(dx*CELL_SIZE,(gravity+1)*CELL_SIZE)
+                        while i < steps:
+                            self._img.move(dx*CELL_SIZE/steps,(gravity+1)*CELL_SIZE/steps)
+                            i += 1
+                            sleep(pause)
+
                     else:
                         self._x = tx
                         self._y = ty+gravity-1
-                        self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+                        while i < steps:
+                            self._img.move(dx*CELL_SIZE/steps,(gravity)*CELL_SIZE/steps)
+                            i += 1
+                            sleep(pause)
         else:
             self.isDead = True
+
                         
                     
     def testMove (self,dx,dy):
