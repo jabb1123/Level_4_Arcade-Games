@@ -33,14 +33,17 @@ DIG = {
     'x':(1,1)
     }
 
+"""Gets the screen Position."""
 def screen_pos (x,y):
     return (x*CELL_SIZE+10,y*CELL_SIZE+10)
 
+"""Gets the scaled index of the screen position."""
 def screen_pos_index (index):
     x = index % LEVEL_WIDTH
     y = (index - x) / LEVEL_WIDTH
     return screen_pos(x,y)
 
+"""Gets the index if the board is represented in one dimension."""
 def index (x,y):
     return x + (y*LEVEL_WIDTH)
 
@@ -345,21 +348,6 @@ def create_screen (level,window):
 
             elt[(sx,sy)].draw(window)
     return elt
-
-"""
-Image(anchorPoint, filename)
-Constructs an image from contents of the given file, centered at the given anchor point. 
-Can also be called with width and height parameters instead of filename.
- In this case, a blank (transparent) image is created of the given width and height.
-"""
-
-"""
-- implement multiple levels, and read those levels from a text file --
-a level should describe where the exit is, where the ladder that appears
- leading to the exit is, the initial position of the player, the number and
- initial positions of the baddies, and anything else you may have added to 
- the game.
-"""
 
 
 def main ():
