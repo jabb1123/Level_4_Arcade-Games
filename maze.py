@@ -124,7 +124,6 @@ class Character (object):
         unStandable = [0,3,4]
         gravity = 0
 
-    
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
             if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
                 return False
@@ -144,14 +143,11 @@ class Character (object):
                 else:
                     return True
                 return False
-            
             elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
                 while self._level[index(tx,ty+gravity)]==0 and ty+gravity+1 < LEVEL_HEIGHT:
                     gravity += 1
-                    
                 if self._level[index(tx,ty+gravity)]!=1:
                     return True
-                
                 else:
                     return True
                 return False
@@ -205,6 +201,8 @@ class Baddie (Character):
 
     def baddieMove(self):
         if not self.isDead:
+            if self._x == self._player._x and self._y == self._player._y:
+                self._player.isDead = True
             if self._y > self._player._y and self.testMove(0,-1):
                 self.move(0,-1)
                 t =Timer(movementSpeed,self.baddieMove)
@@ -409,7 +407,6 @@ def main ():
     b3.start()
 
     while not p.at_exit():
-
         key = window.checkKey()
         if p.isDead:
             lose(window)
