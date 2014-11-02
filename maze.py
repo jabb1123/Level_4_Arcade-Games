@@ -50,7 +50,7 @@ def screen_pos_index (index):
 def index (x,y):
     return x + (y*LEVEL_WIDTH)
 
-
+"""Character class that both Players and Baddies inherits from."""
 class Character (object):
     def __init__ (self,pic,x,y,window,level,screen):
         (sx,sy) = screen_pos(x,y)
@@ -62,13 +62,14 @@ class Character (object):
         self._level = level
         self._screen = screen
         self.isDead = False
-
+    
+    """returns the locations of the character."""
     def same_loc (self,x,y):
         return (self._x == x and self._y == y)
 
 #nothing = 0,bricks = 1,ladder = 2,rope = 3,gold = 4.
-    
 
+    """Movement Logic for the characters."""
     def move (self,dx,dy):
         tx = self._x + dx
         ty = self._y + dy
@@ -81,6 +82,9 @@ class Character (object):
                 
                 if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
                     pass
+                if self._level[index(tx,ty)] == 3 and self._level[index(self._x,self._y)] ==0 and dy == -1:
+                    pass
+                
                 elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
                     self._x = tx
                     self._y = ty
@@ -100,7 +104,7 @@ class Character (object):
                 
                 
                 elif self._level[index(tx,ty)] == 0 and dy==0:
-                    if self._level[index(tx,ty+1)] == 0:
+                    if self._level[index(tx,ty)] == 0:
                         while ty+gravity+1 < LEVEL_HEIGHT and self._level[index(tx,ty+gravity)]==0:
                             gravity += 1
                         if self._level[index(tx,ty+gravity)]!=1:
@@ -149,7 +153,7 @@ class Character (object):
             self.isDead = True
 
                         
-                    
+    """Tests the movement for the baddies to see whether it can move there."""
     def testMove (self,dx,dy):
         tx = self._x + dx
         ty = self._y + dy
@@ -185,7 +189,8 @@ class Character (object):
                 return False
             return False
         return False
-                
+    
+    """Dig method that destroys a brick. Fills up after some time."""            
     def dig (self,x,y):
         tx = self._x + x
         ty = self._y + y
@@ -193,11 +198,8 @@ class Character (object):
             if self._level[index(tx,ty)] == 1 or self._level[index(tx,ty)] == 4:
                 hole = Hole(tx,ty,self._window,self._screen,self._level)
                 return hole
-        
-                
-            
 
-
+"""Player character class."""
 class Player (Character):
     def __init__ (self,x,y,window,level,screen):
         Character.__init__(self,'android.gif',x,y,window,level,screen)
@@ -223,9 +225,11 @@ class Player (Character):
                 self._level[index(34,1)] = 2
                 self._level[index(34,2)] = 2
                 
+                """the ladders are drawn after all the golds are collected."""
                 for i in img:
                     i.draw(self._window)
 
+"""Enemy class."""
 class Baddie (Character):
     def __init__ (self,x,y,window,level,player,screen):
         Character.__init__(self,'red.gif',x,y,window,level,screen)
@@ -260,6 +264,7 @@ class Baddie (Character):
         else:
             self._img.undraw()
 
+"""Hole object used when you dig a hole."""
 class Hole (object):
     def __init__(self,x,y,window,screen,level):
         self._x = x
@@ -274,18 +279,8 @@ class Hole (object):
     def fillHole(self):
         self._level[index(self._x,self._y)] = 1
         self._img = self.screen[(self.sx,self.sy)].draw(self._window)
-        
 
-def lost (window):
-    t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
-    t.setSize(36)
-    t.setTextColor('red')
-    t.draw(window)
-    window.getKey()
-    exit(0)
-
-
-
+"""Text displayed when you win."""
 def won (window):
     
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU WON!')
@@ -295,6 +290,7 @@ def won (window):
     window.getKey()
     exit(0)
 
+"""Text displayed when you lose."""
 def lose (window):
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
     t.setSize(36)
@@ -303,26 +299,14 @@ def lose (window):
     window.getKey()
     exit(0)
 
-
-# 0 empty
-# 1 brick
-
-"""
-(a) Implement a function create_level() that creates the initial level of the game.
-That will require you to think about what you want to use as a data structure to represent your level. 
-Remember, your structure should record what tile goes at every position in the level. 
-Each position in the level should contain one of: nothing, bricks, ladder, rope, pile of gold.
- The initial level is a grid 35 by 20 positions looking like this: 
- """
- 
+"""Initializes the level.""" 
 def create_level (num):
     #nothing = 0,bricks = 1,ladder = 2,rope = 3,gold = 4.
     screen = [] 
     
-    
-    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,2]) #13,1,7,1,12,1
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2]) #1,34
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,2]) #1,15,1,1,1,10,1,5
+    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,2]) 
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2]) 
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,2]) 
     screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1])
     
     screen.extend([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,2,1,0,0,0,1,2,0,1]) 
@@ -330,8 +314,7 @@ def create_level (num):
     screen.extend([3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,0,0,0,0,0,0,0,0,2,0,0,0,0,3,3,3,3])   
     screen.extend([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0]) 
     screen.extend([2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1]) 
-    
-    
+     
     screen.extend([2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,2,3,3,3,3,3,3,3,2]) 
     screen.extend([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2]) 
     screen.extend([2,0,0,0,0,0,3,3,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2])
@@ -349,10 +332,9 @@ def create_level (num):
     return screen
 
 """
-(b) Implement a function create_screen() that takes a level and a window (created by graphics.GraphWin)
- and draws a representation of the level in the window, as in the above. 
+It takes a level and a window (created by graphics.GraphWin)
+and draws a representation of the level in the window.
 """
-
 def create_screen (level,window):
     # use this instead of Rectangle below for nicer screen
     brick = 'brick.gif'
@@ -380,8 +362,8 @@ def create_screen (level,window):
 
 
 def main ():
-
-    window = GraphWin("Maze", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)
+    """Draws the game board."""
+    window = GraphWin("Maze", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)   
 
     rect = Rectangle(Point(5,5),Point(WINDOW_WIDTH+15,WINDOW_HEIGHT+15))
     rect.setFill('sienna')
@@ -393,9 +375,9 @@ def main ():
     rect.draw(window)
 
     level = create_level(1)
-    
     img = []
     
+    """Attempt at drawing the ladder so that the player is not hidden behind the ladder."""
     screen = create_screen(level,window)
     level[index(34,0)] = 0
     img.append(screen[screen_pos(34,0)])
@@ -408,47 +390,42 @@ def main ():
     screen[screen_pos(34,1)].undraw()
     screen[screen_pos(34,2)].undraw()
     
-    
+    """Creates the characters."""
     p = Player(10,18,window,level,screen)
-
     baddie1 = Baddie(5,1,window,level,p,screen)
     baddie2 = Baddie(10,1,window,level,p,screen)
     baddie3 = Baddie(15,1,window,level,p,screen)
     
-    holes = []
     b1 = Timer(movementSpeed,baddie1.baddieMove)
-    b1.start()
     b2 = Timer(movementSpeed,baddie2.baddieMove)
     b3 = Timer(movementSpeed,baddie3.baddieMove)
+    b1.start()
     b2.start()
     b3.start()
-
+    holes = []
+    
+    """Game loop."""
     while not p.at_exit():
         key = window.checkKey()
         if p.isDead:
             lose(window)
-        p.onGold(level, img)
+        p.onGold(level, img)    #Checks to see if the player is standing on gold.
         if key == 'q':
             window.close()
             exit(0)
-        if key in MOVE:
+        if key in MOVE:           
             (dx,dy) = MOVE[key]
             p.move(dx,dy)
         if key in DIG:
             (x,y) = DIG[key]
             holes.append(p.dig(x,y))
-        if holes != []:
+        if holes != []:           # Digging and filling implementation.
             if holes[0] == None:
                 del holes[0]
             else:
                 hole = holes.pop(0)
                 t =Timer(5,hole.fillHole)
                 t.start()
-        #b2.cancel()
-        #b3.cancel()
-        
-
-        # baddies should probably move here
 
     won(window)
 
