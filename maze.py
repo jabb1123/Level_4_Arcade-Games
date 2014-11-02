@@ -8,16 +8,30 @@
 
 
 from graphics import *
+from threading import Timer
+import random
 
 LEVEL_WIDTH = 35
 LEVEL_HEIGHT = 20
 
-Timer = 50000
+
 
 CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
 WINDOW_HEIGHT = CELL_SIZE*LEVEL_HEIGHT
 
+
+MOVE = {
+    'Left': (-1,0),
+    'Right': (1,0),
+    'Up' : (0,-1),
+    'Down' : (0,1)
+}
+
+DIG = {
+    'z':(-1,1),
+    'x':(1,1)
+    }
 
 def screen_pos (x,y):
     return (x*CELL_SIZE+10,y*CELL_SIZE+10)
@@ -105,14 +119,15 @@ class Character (object):
         
             
                 
-    def dig (self,x,y,timer):
+    def dig (self,x,y):
         tx = self._x + x
         ty = self._y + y
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            if self._level[index(tx,ty)] == 1:
-                hole = Hole(tx,ty,self._window,self._screen,timer,self._level)
+            if self._level[index(tx,ty)] == 1 or self._level[index(tx,ty)] == 4:
+                hole = Hole(tx,ty,self._window,self._screen,self._level)
                 return hole
-    
+        
+                
             
 
 
@@ -127,12 +142,19 @@ class Player (Character):
     def onGold (self, level):
         if self._level[index(self._x, self._y)] == 4:
             self.gold += 1
-            self.dig(0,0,0)
+            self.dig(0,0)
             
             if self.gold >= 1:
-                level[34] == 2
-                level[69] == 2
-                level[94] == 2
+                self._level[index(34,0)] = 2
+                self._level[index(34,1)] = 2
+                self._level[index(34,2)] = 2
+                l1 = Image(Point(34.5*CELL_SIZE+10,0.5*CELL_SIZE+10),'ladder.gif')
+                l2 = Image(Point(34.5*CELL_SIZE+10,1.5*CELL_SIZE+10),'ladder.gif')
+                l3 = Image(Point(34.5*CELL_SIZE+10,2.5*CELL_SIZE+10),'ladder.gif')
+                l1.draw(self._window)
+                l2.draw(self._window)
+                l3.draw(self._window)
+                
         
         
 
@@ -142,15 +164,20 @@ class Baddie (Character):
         Character.__init__(self,'red.gif',x,y,window,level,screen)
         self._player = player
 
+    def baddieMove(self):
+        (x,y)=MOVE[random.choice(MOVE.keys())]
+        self.move(x,y)
+        t =Timer(.1,self.baddieMove)
+        t.start()
+        
 
 class Hole (object):
-    def __init__(self,x,y,window,screen,timer,level):
+    def __init__(self,x,y,window,screen,level):
         self._x = x
         self._y = y
         self._level = level
         self.screen = screen
         self._window = window
-        self.timer = timer
         (self.sx,self.sy) = screen_pos(self._x,self._y)
         self._level[index(x,y)] = 0
         self._img = self.screen[(self.sx,self.sy)].undraw()
@@ -261,17 +288,7 @@ Constructs an image from contents of the given file, centered at the given ancho
 Can also be called with width and height parameters instead of filename.
  In this case, a blank (transparent) image is created of the given width and height.
 """
-MOVE = {
-    'Left': (-1,0),
-    'Right': (1,0),
-    'Up' : (0,-1),
-    'Down' : (0,1)
-}
 
-DIG = {
-    'a':(-1,1),
-    's':(1,1)
-    }
 
 
 def main ():
@@ -298,9 +315,16 @@ def main ():
     baddie2 = Baddie(10,1,window,level,p,screen)
     baddie3 = Baddie(15,1,window,level,p,screen)
     holes = []
-    current_time = []
-    
+
+    b1 = Timer(3,baddie1.baddieMove)
+    b1.start()
+    b2 = Timer(1,baddie2.baddieMove)
+    b3 = Timer(1,baddie3.baddieMove)
+    b2.start()
+    b3.start()
+
     while not p.at_exit():
+
         key = window.checkKey()
         p.onGold(level)
         
@@ -314,17 +338,17 @@ def main ():
         
         if key in DIG:
             (x,y) = DIG[key]
-            holes.append(p.dig(x,y,Timer))
-            current_time.append(0)
+            holes.append(p.dig(x,y))
         if holes != []:
             if holes[0] == None:
                 del holes[0]
-            elif holes[0].timer-current_time[0]<=0:
+            else:
                 hole = holes.pop(0)
-                hole.fillHole()
-                current_time.pop(0)
-        for i in range(len(current_time)):
-            current_time[i]+=1
+                t =Timer(5,hole.fillHole)
+                t.start()
+        #b2.cancel()
+        #b3.cancel()
+        
 
         # baddies should probably move here
 
