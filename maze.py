@@ -14,7 +14,7 @@ import random
 LEVEL_WIDTH = 35
 LEVEL_HEIGHT = 20
 
-
+movementSpeed = .2
 
 CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
@@ -55,6 +55,7 @@ class Character (object):
         self._y = y
         self._level = level
         self._screen = screen
+        self.isDead = False
 
     def same_loc (self,x,y):
         return (self._x == x and self._y == y)
@@ -67,54 +68,95 @@ class Character (object):
         unStandable = [0,3,4]
         gravity = 0
 
+        if self._level[index(self._x,self._y)] != 1:
+            if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
+                
+                if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
+                    pass
+                elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
+                    self._x = tx
+                    self._y = ty
+                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                
+                elif self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
+                    self._x = tx
+                    self._y = ty
+                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                
+                
+                elif self._level[index(tx,ty)] == 0 and dy==0:
+                    if self._level[index(tx,ty+1)] == 0:
+                        while ty+gravity+1 < LEVEL_HEIGHT and self._level[index(tx,ty+gravity)]==0:
+                            gravity += 1
+                        if self._level[index(tx,ty+gravity)]!=1:
+                            self._x = tx
+                            self._y = ty+gravity
+                            self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+                        else:
+                            self._x = tx
+                            self._y = ty+gravity-1
+                            self._img.move(dx*CELL_SIZE,(gravity-1)*CELL_SIZE)
+                    
+                    else:
+                        self._x = tx
+                        self._y = ty
+                        self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                
+                elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
+                    while self._level[index(tx,ty+gravity)]==0 and ty+gravity+1 < LEVEL_HEIGHT:
+                        gravity += 1
+                        
+                    if self._level[index(tx,ty+gravity)]!=1:
+                        self._x = tx
+                        self._y = ty+gravity
+                        self._img.move(dx*CELL_SIZE,(gravity+1)*CELL_SIZE)
+                    else:
+                        self._x = tx
+                        self._y = ty+gravity-1
+                        self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+        else:
+            self.isDead = True
+                        
+                    
+    def testMove (self,dx,dy):
+        tx = self._x + dx
+        ty = self._y + dy
+        unStandable = [0,3,4]
+        gravity = 0
+
     
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            
             if self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)] in unStandable and dy == -1:
-                pass
+                return False
             elif self._level[index(tx,ty)] == 0 and self._level[index(self._x,self._y)]==2 and dy == -1:
-                self._x = tx
-                self._y = ty
-                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
-            
+                return True
             elif self._level[index(tx,ty)] != 0 and self._level[index(tx,ty)] != 1:
-                self._x = tx
-                self._y = ty
-                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
-            
-            
+                return True
             elif self._level[index(tx,ty)] == 0 and dy==0:
                 if self._level[index(tx,ty+1)] == 0:
                     while ty+gravity+1 < LEVEL_HEIGHT and self._level[index(tx,ty+gravity)]==0:
                         gravity += 1
                     if self._level[index(tx,ty+gravity)]!=1:
-                        self._x = tx
-                        self._y = ty+gravity
-                        self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
+                        return True
                     else:
-                        self._x = tx
-                        self._y = ty+gravity-1
-                        self._img.move(dx*CELL_SIZE,(gravity-1)*CELL_SIZE)
-                
+                        return True
+                    return False
                 else:
-                    self._x = tx
-                    self._y = ty
-                    self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                    return True
+                return False
             
             elif self._level[index(self._x,self._y)] == 3 and self._level[index(tx,ty)] == 0 and dy == 1:
                 while self._level[index(tx,ty+gravity)]==0 and ty+gravity+1 < LEVEL_HEIGHT:
                     gravity += 1
                     
                 if self._level[index(tx,ty+gravity)]!=1:
-                        self._x = tx
-                        self._y = ty+gravity
-                        self._img.move(dx*CELL_SIZE,(gravity+1)*CELL_SIZE)
+                    return True
                 
                 else:
-                    self._x = tx
-                    self._y = ty+gravity-1
-                    self._img.move(dx*CELL_SIZE,(gravity)*CELL_SIZE)
-                
+                    return True
+                return False
+            return False
+        return False
             
             
 
@@ -134,7 +176,13 @@ class Player (Character):
         Character.__init__(self,'android.gif',x,y,window,level,screen)
 
     def at_exit (self):
+        if self._level[index(self._x,self._y)] == 1:
+            self.isDead = True
         return (self._y == 0)
+    
+    def hasLost(self):
+        if self.isDead:
+            return True
 
 
 class Baddie (Character):
@@ -143,11 +191,31 @@ class Baddie (Character):
         self._player = player
 
     def baddieMove(self):
-        (x,y)=MOVE[random.choice(MOVE.keys())]
-        self.move(x,y)
-        t =Timer(.1,self.baddieMove)
-        t.start()
-        
+        if not self.isDead:
+            if self._y > self._player._y and self.testMove(0,-1):
+                self.move(0,-1)
+                t =Timer(movementSpeed,self.baddieMove)
+                t.start()
+            elif self._y < self._player._y and self.testMove(0,1):
+                self.move(0,1)
+                t =Timer(movementSpeed,self.baddieMove)
+                t.start()
+            else:        
+                if self._x > self._player._x and self.testMove(-1,0):
+                    self.move(-1,0)
+                    t =Timer(movementSpeed,self.baddieMove)
+                    t.start()
+                elif self._x < self._player._x and self.testMove(1,0):
+                    self.move(1,0)
+                    t =Timer(movementSpeed,self.baddieMove)
+                    t.start()
+                else:
+                    (x,y) = MOVE[random.choice(MOVE.keys())]
+                    self.move(x,y)
+                    t =Timer(movementSpeed,self.baddieMove)
+                    t.start()
+        else:
+            self._img.undraw()
 
 class Hole (object):
     def __init__(self,x,y,window,screen,level):
@@ -181,6 +249,13 @@ def won (window):
     window.getKey()
     exit(0)
 
+def lose (window):
+    t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
+    t.setSize(36)
+    t.setTextColor('red')
+    t.draw(window)
+    window.getKey()
+    exit(0)
 
 
 # 0 empty
@@ -288,16 +363,19 @@ def main ():
     baddie1 = Baddie(5,1,window,level,p,screen)
     baddie2 = Baddie(10,1,window,level,p,screen)
     baddie3 = Baddie(15,1,window,level,p,screen)
+    
     holes = []
-    b1 = Timer(3,baddie1.baddieMove)
+    b1 = Timer(movementSpeed,baddie1.baddieMove)
     b1.start()
-    b2 = Timer(1,baddie2.baddieMove)
-    b3 = Timer(1,baddie3.baddieMove)
+    b2 = Timer(movementSpeed,baddie2.baddieMove)
+    b3 = Timer(movementSpeed,baddie3.baddieMove)
     b2.start()
     b3.start()
     while not p.at_exit():
 
         key = window.checkKey()
+        if p.isDead:
+            lose(window)
         if key == 'q':
             window.close()
             exit(0)
