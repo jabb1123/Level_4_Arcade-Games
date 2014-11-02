@@ -139,21 +139,20 @@ class Player (Character):
     def at_exit (self):
         return (self._y == 0)
     
-    def onGold (self, level):
+    def onGold (self, level, img):
         if self._level[index(self._x, self._y)] == 4:
             self.gold += 1
             self.dig(0,0)
+            print self.gold
             
-            if self.gold >= 1:
+            if self.gold >= 13:
                 self._level[index(34,0)] = 2
                 self._level[index(34,1)] = 2
                 self._level[index(34,2)] = 2
-                l1 = Image(Point(34.5*CELL_SIZE+10,0.5*CELL_SIZE+10),'ladder.gif')
-                l2 = Image(Point(34.5*CELL_SIZE+10,1.5*CELL_SIZE+10),'ladder.gif')
-                l3 = Image(Point(34.5*CELL_SIZE+10,2.5*CELL_SIZE+10),'ladder.gif')
-                l1.draw(self._window)
-                l2.draw(self._window)
-                l3.draw(self._window)
+                
+                for i in img:
+                    i.draw(self._window)
+
                 
         
         
@@ -224,9 +223,9 @@ def create_level (num):
     screen = [] 
     
     
-    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,0]) #13,1,7,1,12,1
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]) #1,34
-    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0]) #1,15,1,1,1,10,1,5
+    screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,2]) #13,1,7,1,12,1
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2]) #1,34
+    screen.extend([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,2]) #1,15,1,1,1,10,1,5
     screen.extend([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1])
     
     screen.extend([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,2,1,0,0,0,1,2,0,1]) 
@@ -289,6 +288,13 @@ Can also be called with width and height parameters instead of filename.
  In this case, a blank (transparent) image is created of the given width and height.
 """
 
+"""
+- implement multiple levels, and read those levels from a text file --
+a level should describe where the exit is, where the ladder that appears
+ leading to the exit is, the initial position of the player, the number and
+ initial positions of the baddies, and anything else you may have added to 
+ the game.
+"""
 
 
 def main ():
@@ -305,10 +311,23 @@ def main ():
     rect.draw(window)
 
     level = create_level(1)
-
-
+    
+    img = []
+    
     screen = create_screen(level,window)
-
+    level[index(34,0)] = 0
+    img.append(screen[screen_pos(34,0)])
+    level[index(34,1)] = 0
+    img.append(screen[screen_pos(34,1)])
+    level[index(34,2)] = 0
+    img.append(screen[screen_pos(34,2)])
+    
+    screen[screen_pos(34,0)].undraw()
+    screen[screen_pos(34,1)].undraw()
+    screen[screen_pos(34,2)].undraw()
+    
+    print img
+    
     p = Player(10,18,window,level,screen)
 
     baddie1 = Baddie(5,1,window,level,p,screen)
@@ -326,7 +345,7 @@ def main ():
     while not p.at_exit():
 
         key = window.checkKey()
-        p.onGold(level)
+        p.onGold(level, img)
         
         if key == 'q':
             window.close()
