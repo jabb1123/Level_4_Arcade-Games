@@ -1,10 +1,19 @@
-#
-# MAZE
-# 
-# Example game
-#
-# Version without baddies running around
-#
+"""
+Game Programming: Assignment 4
+Maze Game
+
+
+Julian Morris and Jacob Riedel
+11/3/14
+
+Code: For part 3 on improving the game section, we decided to implement the
+smooth move and smooth falling. We did this by making the player move multiple
+steps for every tile it moves, just as you suggested. However, since Python is
+slow, it crashes fairly often if the global variable "steps" is set to anything
+above 4, where it only starts to get smooth when steps is more than 12, preferably 24.
+Also, the steps variable must be such that 24 is a multiple of steps.
+ex. 24/steps must be an integer so that the image doesn't get stuck between tiles.
+"""
 
 
 from graphics import *
@@ -15,9 +24,10 @@ import random
 LEVEL_WIDTH = 35
 LEVEL_HEIGHT = 20
 
-movementSpeed = .2
-steps = 24
-pause = 0.01
+movementSpeed = .1
+#steps = 24                 Use this value to see our smooth implementation. It crashes after about 15 seconds though.
+steps = 4
+pause = 0.001
 
 CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
@@ -204,11 +214,21 @@ class Player (Character):
     def __init__ (self,x,y,window,level,screen):
         Character.__init__(self,'android.gif',x,y,window,level,screen)
         self.gold = 0
-
+        self.posOnLadder = 0
+        
     def at_exit (self):
         if self._level[index(self._x,self._y)] == 1:
             self.isDead = True
         return (self._y == 0)
+    
+    def at_ladder (self):
+        ladderY = [0,1,2]
+        if self._x == 34 and self._y in ladderY and self.posOnLadder!=self._y:
+            self.posOnLadder = self._y
+            return True
+        else:
+            return False
+            
     
     def hasLost(self):
         if self.isDead:
@@ -220,7 +240,7 @@ class Player (Character):
             self.dig(0,0)
             print self.gold
             
-            if self.gold >= 13:
+            if self.gold >= 2:
                 self._level[index(34,0)] = 2
                 self._level[index(34,1)] = 2
                 self._level[index(34,2)] = 2
@@ -426,7 +446,12 @@ def main ():
                 hole = holes.pop(0)
                 t =Timer(5,hole.fillHole)
                 t.start()
+        if p.at_ladder() == True:
+            p._img.undraw()            
+            p._img.draw(window)
 
+            
+           
     won(window)
 
 if __name__ == '__main__':
